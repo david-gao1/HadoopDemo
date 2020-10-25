@@ -2,8 +2,7 @@ package com.gao.helloHadoop;
 
 import org.apache.hadoop.fs.FileSystem;
 
-import static com.gao.helloHadoop.HDFSBasic.getFileSystem;
-import static com.gao.helloHadoop.HDFSBasic.getFilesFromPath;
+import static com.gao.helloHadoop.HDFSBasic.*;
 
 /**
  * Java代码操作HDFS
@@ -12,7 +11,7 @@ import static com.gao.helloHadoop.HDFSBasic.getFilesFromPath;
 public class HdfsCURDDemo {
     public static void main(String[] args) throws Exception {
         FileSystem fileSystem = getFileSystem();
-        //uploadFile(fileSystem);
+        uploadFile(fileSystem);
         //getfileFromHDFS(fileSystem);
         //deleteFile(fileSystem);
         getFilesFromPath(fileSystem);

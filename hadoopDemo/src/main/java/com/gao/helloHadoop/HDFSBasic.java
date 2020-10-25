@@ -73,7 +73,7 @@ public class HDFSBasic {
      * @throws IOException
      */
     public static void uploadFile(FileSystem fileSystem) throws IOException {
-        FileInputStream fis = new FileInputStream("C:\\Users\\v_liangggao\\Desktop\\hadoop_test.txt");
+        FileInputStream fis = new FileInputStream("C:\\Users\\v_liangggao\\Desktop\\wc_test.txt");
         FSDataOutputStream fos = fileSystem.create(new Path("/gao1/user.txt"));
         IOUtils.copyBytes(fis, fos, 1024, true); //使用工具类上传文件
     }

@@ -1,0 +1,110 @@
+#一、继承类Mapper
+##1、继承类mapper参数讲解
+|参数|说明|备注|
+|---|---|---|
+|keyIn|每一行的起始量|
+|valueIn|输入值的类型|
+|keyOut|输出值的类型，指每一个单词 String|
+|valueOut|输出值的类型，指单词的次数|
+
+##2、传输的数据类型
+*说明*
+因为map数据要经过网络传输到reduce端，所有的数据类型必须具备序列化和反序列化的能力。
+hadoop中定义了一套序列化反序列化的接口：xxxWritable，如下对照表：
+
+|序号|java类型|hadoop类型|
+|---|---|---|
+|1|long|LongWriteable|
+|2|int|IntWriteable|
+|3|byte|ByteWriteable|
+|4|double|DoubleWriteable|
+|5|null|NullWriteable|
+|6|String|**Text**|
+
+##复写的函数讲解
+函数的调用频率：一行调用一次
+注：见MyMapper
+
+#二、继承类MyReducer
+##1、继承类reducer参数讲解
+|参数|说明|备注|
+|---|---|---|
+|keyIn|接收的key的类型|map传过来的key的类型
+|valueIn|接收的value的类型|map传过来的value类型
+|keyOut|输出的key类型|单词
+|valueOut|输出的value类型|指单词最终词频
+
+##2、复写的函数
+函数的调用频率：一组调用一次
+
+#三、组装map和reduce流程
+1、创建job：封装map和reduce的相关配置
+2、设置输入输出参数：为文件路径（待计算的文件，待输出的文件（不存在））
+3、设置map和reduce的加载类，输出类型
+4、提交给job，打印执行的过程
+
+
+#四、打包
+##1、添加打包依赖
+```xml
+    <build>
+        <plugins>
+            <!-- compiler插件, 设定JDK版本 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass></mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+```
+##2、其他依赖设置
+因为hadoop-client和log4j依赖在集群中都是存在的，所以需要将这两个依赖设置为provided，表示
+这两个依赖只在编译的时候使用，而在执行和打包的时候就不使用了。
+
+
+#五、打包
+##1、添加数据测试
+略
+##2、执行
+```shell script
+hadoop jar db_hadoop-1.0-SNAPSHOT-jar-with-dependencies.jar com.imooc.mr.WordCountJob /test/hello.txt /out
+```
+参数部分讲解：
+
+|参数|解释|
+|---|---|
+|hadoop|表示使用hadoop脚本执行任务|
+|jar|表示执行的是jar包|
+|/test/hello.txt|接收的第一个参数，可以是文件的路径，也可以是文件夹的路径，处理批文件|
+|/out|接收的第二个参数，代表的是输出的目录，目录必须不存在|
+
+
