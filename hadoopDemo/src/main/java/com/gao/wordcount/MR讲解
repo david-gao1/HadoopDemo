@@ -90,8 +90,12 @@ hadoop中定义了一套序列化反序列化的接口：xxxWritable，如下对
 因为hadoop-client和log4j依赖在集群中都是存在的，所以需要将这两个依赖设置为provided，表示
 这两个依赖只在编译的时候使用，而在执行和打包的时候就不使用了。
 
+###3、打包
+```shell script
+mvn clean package -DskipTests
+```
 
-#五、打包
+#五、测试
 ##1、添加数据测试
 略
 ##2、执行

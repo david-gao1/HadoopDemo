@@ -1,0 +1,49 @@
+#小文件的生产解决方案
+##1、使用MapFile的方式合并小文件
+###1.1、代码
+见代码
+###1.2、解析
+生成的文件如下所示：
+```shell script
+[root@hadoop01 tmpfile]# hdfs dfs -ls /mapFile
+Found 2 items
+-rw-r--r--   3 v_liangggao supergroup        811 2020-10-25 21:18 /mapFile/data
+-rw-r--r--   3 v_liangggao supergroup        217 2020-10-25 21:18 /mapFile/index
+```
+####简析：
+
+MapFile是排序后的SequenceFile。
+
+MapFile由两部分组成，即index和data。
+
+index作为文件的数据索引，主要记录了**每个record的key值**，以及该record在文件中的偏移位置。
+
+MapFile被访问的时候，索引文件会被加载到内存，通过索引的映射关系可迅速定位到指定record所在文件位置。
+所以相对SequenceFile而言，MapFile的检索效率是高效的，但是会消耗一部分内容来存储index数据。
+
+##2、使用SequenceFile的方式合并小文件
+###2.1、代码
+见代码
+###2.2、解析
+生成的文件如下所示：
+```shell script
+[root@hadoop01 tmpfile]# hdfs dfs -ls /seqFile
+-rw-r--r--   3 v_liangggao supergroup        811 2020-10-25 21:37 /seqFile
+```
+####简析：
+SequenceFile是hadoop提供的一种二进制文件，这种二进制文件直接将<key,value>队序列化到文件中。
+小文件的文件名保存到key中，文件的内容序列化到value中。
+缺点是：需要一个合并的过程，合并后需要遍历才能查看到对应的文件。
+其实可以将SequenceFile理解为将许多小文件压缩成一个大的压缩包了。
+
+##3、合并之后的计算
+在WC案例中只能执行普通文件，需要读取SequenceFile，需要在job中设置输入数据处理类就可，见代码
+```java
+//设置输入数据处理类
+ job.setInputFormatClass(SequenceFileInputFormat.class);
+```
+
+执行
+```shell script
+hadoop jar db_hadoop-1.0-SNAPSHOT-jar-with-dependencies.jar com.imooc.mr.WordCountJobSeq /seqFile /out10
+```
