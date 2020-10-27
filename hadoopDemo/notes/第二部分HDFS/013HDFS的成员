@@ -1,14 +1,4 @@
-###成员组成
-nameNode，dataNode，
-HDFS has a master/slave architecture.
-
-An HDFS cluster consists of a single NameNode, a master server that manages the file system namespace and regulates access to files by clients. In addition, there are a number of DataNodes, usually one per node in the cluster, which manage storage attached to the nodes that they run on.
-
-HDFS exposes a file system namespace and allows user data to be stored in files.
-Internally, a file is split into one or more blocks and these blocks are stored in a set of DataNodes.
-
-The NameNode executes file system namespace operations like opening, closing, and renaming files and directories. It also determines the mapping of blocks to DataNodes.
-The DataNodes are responsible for serving read and write requests from the file system’s clients. The DataNodes also perform block creation, deletion, and replication upon instruction from the NameNode.
+###成员组成：nameNode，dataNode，
 
 ####HDFS是一个主从架构
 
@@ -19,12 +9,6 @@ The DataNodes are responsible for serving read and write requests from the file 
 
 NN能够实现开启，关闭命名空间（其实就是文件夹），重命名文件或者文件夹；
 DN处理来自客户端的读请求和写请求。DN还根据NN的指令执行块的创建，删除和复制。
-
-
-The NameNode and DataNode are pieces of software designed to run on commodity machines. These machines typically run a GNU/Linux operating system (OS). HDFS is built using the Java language; any machine that supports Java can run the NameNode or the DataNode software. Usage of the highly portable Java language means that HDFS can be deployed on a wide range of machines. A typical deployment has a dedicated machine that runs only the NameNode software. Each of the other machines in the cluster runs one instance of the DataNode software. The architecture does not preclude running multiple DataNodes on the same machine but in a real deployment that is rarely the case.
-
-The existence of a single NameNode in a cluster greatly simplifies the architecture of the system. The NameNode is the arbitrator and repository for all HDFS metadata. The system is designed in such a way that user data never flows through the NameNode.
-
 
 ####NN和DN一般跑在虚拟机上。
 
@@ -37,4 +21,4 @@ HDFS是java语言创建的。任何支持java语言的机器都可以运行HDFS�
 集群中一个NN简化了系统的架构。NN管理和存储着HDFS元数据。
 使得用户的数据流经不过NN
 
-The NameNode maintains the file system namespace. Any change to the file system namespace or its properties is recorded by the NameNode. An application can specify the number of replicas of a file that should be maintained by HDFS. The number of copies of a file is called the replication factor of that file. This information is stored by the NameNode.
+NN维护着文件系统的命名空间，NN会记录任何命名空间和其属性的修改。一个应用可以明确文件的副本数。副本的数量称为副本因子。NN也保存着副本因子的信息。
