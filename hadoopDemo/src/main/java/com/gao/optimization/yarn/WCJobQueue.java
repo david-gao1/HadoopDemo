@@ -1,4 +1,5 @@
-package com.gao.optimization;
+package com.gao.optimization.yarn;
+
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -8,24 +9,21 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.hadoop.util.GenericOptionsParser;
 
 import java.io.IOException;
 
 /**
- * 需求：读取SequenceFile文件
+ * 指定队列名称
+ * <p>
  * Created by xuwei
  */
-public class WordCountJobSeq {
+public class WCJobQueue {
     /**
      * Map阶段
      */
-    public static class MyMapper extends Mapper<Text, Text, Text, LongWritable> {
-        Logger logger = LoggerFactory.getLogger(MyMapper.class);
-
+    public static class MyMapper extends Mapper<LongWritable, Text, Text, LongWritable> {
         /**
          * 需要实现map函数
          * 这个map函数就是可以接收<k1,v1>，产生<k2，v2>
@@ -37,11 +35,8 @@ public class WordCountJobSeq {
          * @throws InterruptedException
          */
         @Override
-        protected void map(Text k1, Text v1, Context context)
+        protected void map(LongWritable k1, Text v1, Context context)
                 throws IOException, InterruptedException {
-            System.out.println("<k1,v1>=<" + k1.toString() + "," + v1.toString() + ">");
-            //logger.info("<k1,v1>=<"+k1.get()+","+v1.toString()+">");
-
             String[] words = v1.toString().split(" ");
             for (String word : words) {
                 Text k2 = new Text(word);
@@ -56,8 +51,6 @@ public class WordCountJobSeq {
      * Reduce阶段
      */
     public static class MyReducer extends Reducer<Text, LongWritable, Text, LongWritable> {
-        Logger logger = LoggerFactory.getLogger(MyReducer.class);
-
         /**
          * 针对<k2,{v2...}>的数据进行累加求和，并且最终把数据转化为k3,v3写出去
          *
@@ -72,16 +65,12 @@ public class WordCountJobSeq {
                 throws IOException, InterruptedException {
             long sum = 0L;
             for (LongWritable v2 : v2s) {
-                //System.out.println("<k2,v2>=<"+k2.toString()+","+v2.get()+">");
-                //logger.info("<k2,v2>=<"+k2.toString()+","+v2.get()+">");
                 sum += v2.get();
             }
 
-            //组装 k3,v3
+
             Text k3 = k2;
             LongWritable v3 = new LongWritable(sum);
-            //System.out.println("<k3,v3>=<"+k3.toString()+","+v3.get()+">");
-            //logger.info("<k3,v3>=<"+k3.toString()+","+v3.get()+">");
             context.write(k3, v3);
         }
     }
@@ -91,29 +80,20 @@ public class WordCountJobSeq {
      */
     public static void main(String[] args) {
         try {
-            if (args.length != 2) {
-                //如果传递的参数不够，程序直接退出
-                System.exit(100);
-            }
-
-            //创建job实例
             Configuration conf = new Configuration();
+            //解析命令行中-D后面传递过来的参数，添加到conf中
+            String[] remainingArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
+
+            //创建一个Job
             Job job = Job.getInstance(conf);
-            job.setJarByClass(WordCountJobSeq.class);
+            job.setJarByClass(WCJobQueue.class);
 
-            FileInputFormat.setInputPaths(job, new Path(args[0]));
-            FileOutputFormat.setOutputPath(job, new Path(args[1]));
+            FileInputFormat.setInputPaths(job, new Path(remainingArgs[0]));
+            FileOutputFormat.setOutputPath(job, new Path(remainingArgs[1]));
 
-            //指定map相关的代码
             job.setMapperClass(MyMapper.class);
             job.setMapOutputKeyClass(Text.class);
             job.setMapOutputValueClass(LongWritable.class);
-
-            //设置输入数据处理类
-            job.setInputFormatClass(SequenceFileInputFormat.class);
-
-
-            //指定reduce相关的代码
             job.setReducerClass(MyReducer.class);
             job.setOutputKeyClass(Text.class);
             job.setOutputValueClass(LongWritable.class);

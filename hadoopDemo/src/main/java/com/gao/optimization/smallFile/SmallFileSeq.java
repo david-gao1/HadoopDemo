@@ -1,4 +1,4 @@
-package com.gao.optimization;
+package com.gao.optimization.smallFile;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;

@@ -1,0 +1,7 @@
+#YARN中调度器多资源队列的配置
+##进行资源队列的配置
+
+##进行资源对列的指定
+```shell script
+[root@bigdata01 hadoop-3.2.0]# hadoop jar db_hadoop-1.0-SNAPSHOT-jar-with-dependencies.jar com.imooc.mr.WordCountJobQueue -Dmapreduce.job.queuename=offline /test/hello.txt /outqueue
+```

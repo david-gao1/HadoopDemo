@@ -33,6 +33,5 @@ public class MyMapper extends Mapper<LongWritable, Text, Text, LongWritable> {
             context.write(k2, v2);
         }
     }
-
 }
 

@@ -1,0 +1,6 @@
+##HDFS简介 
+HDFS全称是Hadoop Distributed File System 
+   
+分布式文件系统 
+   
+HDFS是一种适合大文件存储的分布式文件系统，不适合小文件存储。

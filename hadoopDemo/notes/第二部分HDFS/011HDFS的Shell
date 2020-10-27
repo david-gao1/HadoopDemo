@@ -1,0 +1,22 @@
+##HDFS的shell 
+   
+![hdfs_shell](hdfs_shell.png)
+    
+|参数|解释|
+|---|---|
+|hdfs|hdfs的执行命令| 
+|dfs|表示操作分布式文件系统| 
+|-xxx：|具体对hdfs作什么操作；大部分hdfs的命令和Linux命令类似 
+|Schema|HDFS的schema是hdfs| 
+|authority|是集群中namenode所在节点的ip和对应的端口号| 
+|path|是我们要操作的文件路径| 
+
+注意：  
+core.site.xml配置文件中fs.defaultFS属性的值，代表的是HDFS的地址，所以在使用命令的时候可以省略scheme://authority。 
+
+常见shell操作 ：命令和linxu基本一致  
+
+|序号|操作|api|
+|---|---|---| 
+|1|||
+|2|||

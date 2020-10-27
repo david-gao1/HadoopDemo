@@ -1,0 +1,64 @@
+#前言
+数据map，reduce阶段执行效率的讨论。
+默认情况下Map阶段中Map任务的个数是和数据的ImputSplit相关的，而一般InputSplitNum=blockNum，所以可以认为Map任务的个数=数据block块的个数。
+
+一般对于小文件需要进行合并之外，其他情况是不需要进行调整的。
+
+对于reduce阶段，
+
+默认情况下。reduce的个数是1。当数据量比较大时，需要考虑增加reduce的个数，实现数据分流，提高计算效率。
+
+通过对数据分区，实现增加reduce的个数。每一个分区的数据会被一个reduce任务处理。
+
+而在分区的时候难免会遇到数据倾斜的问题。
+
+##实现增加分区的方式
+默认情况下，是使用`HashPartitioner`这个分区类，实现默认分区。通过 `job.getPartitionerClass()`来查看。见代码：
+```java
+@InterfaceAudience.Public
+@InterfaceStability.Stable
+public class HashPartitioner<K, V> extends Partitioner<K, V> {
+  
+  public int getPartition(K key, V value,
+                          int numReduceTasks) {
+    return (key.hashCode() & Integer.MAX_VALUE) % numReduceTasks;
+  }
+
+}
+```
+map中每一条数据都会进入到这个方法中获取他们所在的分区信息。key=key2和value=value2。
+
+计算分区的逻辑是：
+`return (key.hashCode() & Integer.MAX_VALUE) % numReduceTasks;`
+
+`numReduceTasks`的默认值是1，所以默认情况下所有的数据都是在`0`这个分区。
+
+也就是说，设置`numReduceTasks`就可设置分区数。
+##数据倾斜
+有时会分区后的数据会出现倾斜的问题，比如null值较多时。如果有一个reduce计算的数据远远大于其他reduce，则整个mapreduce阶段运行的效率受这个分区的影响。
+所以需要将此分区进行数据`打散`。
+
+###解决数据倾斜：加随机数
+局部代码：
+```java
+//map：数据加随机数
+String key = words[0];
+if ("5".equals(key)) {
+     //把倾斜的key打散，分成10份
+     key = "5" + "_" + random.nextInt(10);
+ }
+//reduce：每一个key和处理。
+//job设置reduce任务个数
+job.setNumReduceTasks(Integer.parseInt(args[2]));
+```
+执行时数据会进行均摊到各个分区，使得整个运行的时间变短。但实际上，由于reduce阶段处理的是加了随机数的key，所以相当于是做了局部聚合。
+所以还需要进行`去随机数`再进行一次全局的聚合。
+
+
+
+
+
+
+
+
+
