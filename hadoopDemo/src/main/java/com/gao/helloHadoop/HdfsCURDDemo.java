@@ -1,6 +1,7 @@
 package com.gao.helloHadoop;
 
-import org.apache.hadoop.fs.FileSystem;
+
+import java.nio.file.FileSystem;
 
 import static com.gao.helloHadoop.HDFSBasic.*;
 

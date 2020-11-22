@@ -3,5 +3,29 @@
 
 |序号|操作|api|
 |---|---|---| 
-|1|||
-|2|||
+|1|获取客户端实例 ||
+|2|创建文件夹||
+|3|上传文件||
+|4|下载文件||
+|5|重命名||
+|6|查看文件status||
+|7|删除文件||
+
+
+0、Configuration： 
+
+配置信息类，任何作用的配置信息必须通过Configuration传递，因为通过Configuration可以实现在多个mapper和多个reducer任务之间共享信息。来自 <https://blog.csdn.net/ghuilee/article/details/45771003>  
+
+1、在 java 中操作 hdfs，首先要获得一个客户端实例：即 DistributedFileSystem 的实例； 
+
+2、get 方法判断实例化客户端类 
+
+A、conf 中的fs.defaultFS参数告诉具体化客户端类是什么 
+
+B、设置：表示获取的是该uri的文件系统的实例，即我们需要的hdfs集群的一个filesystem。 
+
+加载配置文件：conf.addResource("./config/core-default01.xml"); 
+
+默认：自于 hadoop 的 jar 包中的 core-default.xml，默认值为： file:///。 
+
+ 是一个本地文件系统的客户端对象 
